@@ -6,8 +6,6 @@ function removeFromArray(arr, elt) {
     }
 }
 
-
-
 cols = 5;
 rows = 5;
 
@@ -15,7 +13,8 @@ var grid = new Array(cols);
 
 var openSet = [];
 var closedSet = [];
-var start, end;
+var start;
+var end;
 
 var w, h;
 
@@ -23,17 +22,34 @@ function Spot(i, j) {
     this.f = 0;
     this.g = 0;
     this.h = 0;
-    this.x = i;
-    this.y = j;
+    this.i = i;
+    this.j = j;
+    this.neighbours = [];
 
 
     this.show = function(col) {
         fill(col);
         noStroke();
-        rect(this.x * w, this.y * h, w - 1, h - 1);
+        rect(this.i * w, this.j * h, w - 1, h - 1);
+    }
+
+    this.addNeighbours = function(grid) {
+        this.i = i;
+        this.j = j;
+        if (i < cols - 1) {
+            this.neighbours.push(grid[i + 1, j]);
+        }
+        if (i > 0) {
+            this.neighbours.push(grid[i - 1, j]);
+        }
+        if (j < rows - 1) {
+            this.neighbours.push(grid[i, j + 1]);
+        }
+        if (j > 0) {
+            this.neighbours.push(grid[i, j - 1]);
+        }
     }
 }
-
 
 
 function setup() {
@@ -53,12 +69,17 @@ function setup() {
             grid[i][j] = new Spot(i, j);
         }
     }
+    for (var i = 0; i < cols; i++) {
+        for (var j = 0; j < rows; j++) {
+            grid[i][j].addNeighbours(grid);
+        }
+    }
     start = grid[0][0];
     end = grid[cols - 1][rows - 1];
 
+    openSet.push(start);
 
-removeFromArray(openSet, current)
-    openSet.push(current);
+
 
 }
 
@@ -74,17 +95,18 @@ function draw() {
         }
         // keep going
         var current = openSet[winner];
-        if (openSet[winner] === end) {
+        if (current === end) {
             console.log("Done!");
         }
-        closedSet.push(current);
+
         removeFromArray(openSet, current);
+        closedSet.push(current);
     } else {
         //no solution
     }
 
     for (var i = 0; i < cols; i++) {
-        for (var j = 0; j < cols; j++) {
+        for (var j = 0; j < rows; j++) {
             grid[i][j].show(255);
 
         }
@@ -93,7 +115,7 @@ function draw() {
         closedSet[i].show(color(199, 76, 123));
     }
     for (var i = 0; i < openSet.length; i++) {
-        openSet[i].show(color(76, 123, 199));
+        openSet[i].show(color(76, 199, 123));
     }
 
 }
