@@ -13,8 +13,8 @@ function heuristic(a, b) {
     return d;
 }
 
-cols = 18;
-rows = 18;
+cols = 29;
+rows = 29;
 
 var grid = new Array(cols);
 
@@ -34,10 +34,18 @@ function Spot(i, j) {
     this.j = j;
     this.neighbours = [];
     this.previous = undefined;
+    this.wall = false;
+
+    if(random(1)<0.3){
+        this.wall = true;
+    }
 
 
     this.show = function(col) {
         fill(col);
+        if(this.wall){
+            fill(color(0));
+        }
         noStroke();
         rect(this.i * w+1, this.j * h+1, w - 2, h - 2);
     }
@@ -83,8 +91,8 @@ function setup() {
             grid[i][j].addNeighbours(grid);
         }
     }
-    start = grid[3][0];
-    end = grid[cols - 4][rows - 3];
+    start = grid[0][0];
+    end = grid[cols - 1][rows - 1];
 
     openSet.push(start);
 }
@@ -112,7 +120,7 @@ function draw() {
         var neighbours = current.neighbours;
         for (var i = 0; i < neighbours.length; i++) {
             var neighbour = neighbours[i];
-            if (!closedSet.includes(neighbour)) {
+            if (!closedSet.includes(neighbour) && !neighbour.wall) {
                 var tempG = current.g + 1;
                 if (openSet.includes(neighbour)) {
                     if (tempG < neighbour.g) {
